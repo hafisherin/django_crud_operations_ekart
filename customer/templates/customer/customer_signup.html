@@ -7,7 +7,10 @@
 
     <!-- ============================ COMPONENT REGISTER   ================================= -->
         <div class="card mx-auto" style="max-width:520px; margin-top:40px;">
-          <article class="card-body"><span style="color: brown;">{{message}}</span>
+          <article class="card-body">
+          <span style="color: brown;">
+            {{message}} || {{status}}
+          </span>
             <header class="mb-4"><h4 class="card-title">Customer Sign up</h4></header>
             <form method="POST">
               {% csrf_token %}

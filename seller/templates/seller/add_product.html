@@ -14,13 +14,15 @@
                 <header class="mb-4">
                     <h4 class="card-title">Add Product</h4>
                 </header>
-                <form action="" method="" enctype="multipart/form-data">
-
+                <form action="" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
                     <div class=" form-group">
                         <label>Product Category</label>
-                        <select class="form-control" name="" id="">
-                            <option value="">Electronics</option>
-                            <option value="">Men's Wear</option>
+                        <select class="form-control" name="category" id="">
+                            <option value="">Select category</option>
+                            {% for item in category %}
+                            <option value="{{item.id}}">{{item.category_name}}</option>
+                            {% endfor %}
                         </select>
                     </div> <!-- form-group end.// -->
                     <div class=" form-group">
@@ -29,7 +31,7 @@
                     </div> <!-- form-group end.// -->
                     <div class=" form-group">
                         <label>Product No</label>
-                        <input type="text" class="form-control" name="product_name">
+                        <input type="text" class="form-control" name="product_no">
                     </div>
                     <div class="form-group">
                         <label>Description</label>
@@ -41,7 +43,7 @@
                             <label>Stock</label>
                             <input type="number" class="form-control" name="stock">
                         </div> <!-- form-group end.// -->
-                    </div> <!-- form-row.// -->                    
+                    </div> <!-- form-row.// -->
 
                     <div class="form-row">
                         <div class="form-group col-md-6">
@@ -57,11 +59,11 @@
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block"> Add product </button>
                     </div> <!-- form-group// -->
-
+                    {{message}}
                 </form>
             </article><!-- card-body.// -->
         </div> <!-- card .// -->
-        
+
         <br><br>
         <!-- ============================ COMPONENT REGISTER  END.// ================================= -->
 

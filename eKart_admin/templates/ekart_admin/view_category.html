@@ -6,6 +6,18 @@
 
 <main class="col-md-9">
    <h1>view_category</h1>
+   <div class="d-flex">
+      {% for item in category %}
+      <div class="card" style="width: 18rem;">
+         <img class="card-img-top" src="{{item.cover_picture.url}}" alt="Card image cap">
+         <div class="card-body">
+            <h5 class="card-title">{{item.category_name}}</h5>
+            <p class="card-text">{{item.description}}</p>
+            <!-- <a href="#" class="btn btn-primary">Edit</a> -->
+         </div>
+      </div>
+      {% endfor %}
+   </div>
 </main>
 
 

@@ -16,6 +16,7 @@
                 <a href="#" class="nav-link"> USD </a>
             </li>
         </ul>
+        
         <ul class="navbar-nav">
             <li><a href="{% url 'customer:seller_register' %}" class="nav-link">Become a seller </a></li>
         </ul> <!-- list-inline //  -->
@@ -64,6 +65,7 @@
                     <div class="d-flex justify-content-end mb-3 mb-lg-0">
                         <div class="widget-header">
                             <small class="title text-muted">Welcome guest!</small>
+                            {{customer_details.first_name}}{{customer_details.last_name}}
                             <div> 
                                 <a href="{% url 'customer:customer_login' %}">Sign in</a> <span class="dark-transp"> | </span>
                                 <a href="{% url 'customer:customer_signup' %}"> Register</a>

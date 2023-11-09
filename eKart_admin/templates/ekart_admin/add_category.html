@@ -15,8 +15,8 @@
                 <header class="mb-4">
                     <h4 class="card-title">Add Category</h4>
                 </header>
-                <form action="" method="" enctype="multipart/form-data">
-                    
+                <form action="" method="POST" enctype="multipart/form-data">
+                    {% csrf_token  %}
                     <div class=" form-group">
                         <label>Category name</label>
                         <input type="text" class="form-control" name="category_name">
@@ -28,9 +28,15 @@
                     </div> <!-- form-group end.// -->             
 
                     <div class="form-group">
+                        <label>Upload Image</label>
+                        
+                       <input type="file" class="form-control" name="category_image">
+                    </div> 
+
+                    <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block"> Add Category </button>
                     </div> <!-- form-group// -->
-
+                 {{message}}
                 </form>
             </article><!-- card-body.// -->
         </div> <!-- card .// -->

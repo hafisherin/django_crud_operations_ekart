@@ -1,6 +1,8 @@
 from django.shortcuts import redirect, render
 
 from customer.models import Seller
+from eKart_admin.models import Category
+from seller.models import Product
 
 # Create your views here.
 def seller_home(request):
@@ -9,7 +11,37 @@ def seller_home(request):
 
 
 def add_product(request):
-    return render(request, 'seller/add_product.html')
+    category_list = Category.objects.all()
+    msg = ''
+    if request.method == 'POST':
+        product_no = request.POST['product_no']
+        product_name = request.POST['product_name']
+        description = request.POST['description']
+        stock = request.POST['stock']
+        price = request.POST['price']
+        image = request.FILES['image']
+        category = request.POST['category']
+        seller_p = request.session['seller']
+        product,created = Product.objects.get_or_create(product_no = product_no ,seller = seller_p,defaults = {
+            'product_no':product_no,
+            'product_name':product_name,
+            'description':description,
+            'stock':stock,
+            'price':price,
+            'image':image,
+            'product_category':Category.objects.get(id = category),
+            'seller':Seller.objects.get(id = seller_p)
+
+        })
+        if created:
+            msg = 'Product added'
+
+        else:
+            msg = 'Product already exist' 
+    context = {'category':category_list,
+                'message':msg}
+        
+    return render(request, 'seller/add_product.html',context)
 
 def add_category(request):
     return render(request, 'seller/add_category.html')
@@ -18,7 +50,8 @@ def view_category(request):
     return render(request, 'seller/view_category.html')
 
 def view_products(request):
-    return render(request, 'seller/view_product.html')
+    products = Product.objects.filter(seller_id = request.session['seller'])
+    return render(request, 'seller/view_product.html',{'products':products})
 
 def profile(request):
     return render(request,'seller/profile.html')
@@ -62,4 +95,4 @@ def change_password(request):
 def seller_logout(request):
     del request.session ['seller']
     request.session.flush()
-    return redirect('Seller:seller_home')
+    return redirect('customer:seller_login')

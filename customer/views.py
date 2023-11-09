@@ -19,7 +19,11 @@ def customer_home(request):
 
 
 def store(request):
-    product = Product.objects.all()
+    query = request.GET.get('query')
+    if query == 'all':
+        product = Product.objects.all()
+    else:
+        product = Product.objects.filter(product_category = query)
     return render(request, 'customer/store.html',{'product':product})
 
 

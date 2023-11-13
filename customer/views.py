@@ -1,10 +1,10 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from random import randint
 from django.conf import settings
 from django.core.mail import send_mail
 
-from customer.models import Customer, Seller
-from seller.models import Product
+from customer.models import Cart, Customer
+from seller.models import Product,Seller
 # Create your views here.
 
 
@@ -28,8 +28,36 @@ def store(request):
 
 
 def product_detail(request,id):
+    msg = ''
     product = Product.objects.get(id = id)
-    return render(request, 'customer/product_detail.html',{'product':product})
+    customer = Customer.objects.get(id = request.session['customer'])
+    
+    if request.method == 'POST':
+        if 'customer'in request.session:
+            cart = Cart(customer = customer,product = product, price= product.price)
+            # product_exist = Product .objects.filter(product = product).exists()
+            
+            cart.save()
+            msg = 'Added to Cart'
+        else:
+            return redirect('customer:customer_login')
+        
+    try:
+        cart_item = get_object_or_404(Cart,customer = customer, product= id)    
+        item_exist = True
+    except Exception as e:
+        item_exist = False
+
+    context ={
+        'product':product,
+        'message':msg,
+        'item_exist':item_exist
+
+    }
+
+
+
+    return render(request, 'customer/product_detail.html',context)
 
 
 def cart(request):

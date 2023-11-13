@@ -2,7 +2,7 @@ from random import randint
 from django.conf import settings
 from django.shortcuts import redirect, render
 from django.core.mail import send_mail
-from customer.models import Seller
+from seller.models import Seller
 from eKart_admin.models import Category
 
 # Create your views here.

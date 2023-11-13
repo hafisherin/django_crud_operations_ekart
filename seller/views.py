@@ -1,8 +1,8 @@
 from django.shortcuts import redirect, render
 
-from customer.models import Seller
+
 from eKart_admin.models import Category
-from seller.models import Product
+from seller.models import Product, Seller
 
 # Create your views here.
 def seller_home(request):

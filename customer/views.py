@@ -1,3 +1,5 @@
+from django.db.models import  F
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from random import randint
 from django.conf import settings
@@ -61,8 +63,41 @@ def product_detail(request,id):
 
 
 def cart(request):
-    return render(request, 'customer/cart.html')
+    customer = Customer.objects.get(id = request.session['customer'])
+    grand_total = 0
 
+    cart = Cart.objects.filter(customer_id = customer.id).annotate(sub_total = F('quantity')*F('price'))
+    for item in cart:
+        grand_total += item.sub_total
+
+
+    context = {
+        'cart':cart,
+        'customer_details':customer,
+        'grand_total':grand_total
+    }
+
+    return render(request, 'customer/cart.html',context)
+
+def remove_cart(request,id):
+    item =Cart.objects.get(id = id)
+    item.delete()
+    return redirect('customer:cart')
+
+def update_cart(request):
+    product_id =request.POST['id']
+    product_quantity  = request.POST['qty']
+    grand_total = 0
+    cart_item = Cart.objects.get(product = product_id)
+    cart_item.quantity = product_quantity
+
+    cart_item.save()
+    
+    cart = Cart.objects.filter(customer_id = request.session['customer']).annotate(sub_total = F('quantity')*F('price'))
+    for item in cart:
+        grand_total += item.sub_total
+
+        return JsonResponse({'status':'quantity_update','grand_total': grand_total})
 
 def place_order(request):
     return render(request, 'customer/place_order.html')

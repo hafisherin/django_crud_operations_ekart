@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
 
@@ -62,7 +63,32 @@ def view_orders(request):
     return render(request,'seller/view_orders.html')
 
 def update_stock(request):
-    return render(request,'seller/update_stock.html')
+
+    msg = ''
+    if request.method == 'POST':
+        
+        product_no = request.POST['product_no']
+        new_stock = request.POST['new_stock']
+        stock = request.POST['stock']
+       
+        products = Product.objects.get(product_no = product_no ,seller_id =request.session['seller'])
+        products.stock =products.stock + int(new_stock)
+
+        products.save()
+
+        msg  = 'Updated successfully'
+    return render(request,'seller/update_stock.html',{'message':msg})
+
+def get_current_stock(request):
+    product_no = request.POST['product_no']
+    product = Product.objects.get(product_no = product_no)
+
+    return JsonResponse({
+
+        'product_name':product.product_name, 
+        'available_stock': product.stock
+        
+        })
 
 def order_history(request):
     return render(request,'seller/order_history.html')

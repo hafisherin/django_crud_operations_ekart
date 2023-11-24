@@ -12,6 +12,7 @@ urlpatterns = [
     path('profile',views.profile,name="profile"),
     path('myOrders',views.view_orders,name="view_orders"),
     path('stock/update',views.update_stock,name="update_stock"),
+    path('stock/get_current_stock',views.get_current_stock,name='get_current_stock'),
     path('order/history',views.order_history,name="order_history"),
     path('change/password',views.change_password,name="change_password"),
     path('seller/logout',views.seller_logout,name = 'seller_logout')

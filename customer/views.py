@@ -1,11 +1,14 @@
+from datetime import date
+import datetime
 from django.db.models import  F
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from random import randint
 from django.conf import settings
 from django.core.mail import send_mail
+import razorpay
 
-from customer.models import Cart, Customer
+from customer.models import Cart, Customer, Order, OrderItem
 from seller.models import Product,Seller
 # Create your views here.
 
@@ -98,9 +101,105 @@ def update_cart(request):
         grand_total += item.sub_total
 
         return JsonResponse({'status':'quantity_update','grand_total': grand_total})
+    
+
+    
+def update_payment(request):
+
+    
+    if request.method == 'GET':
+        return redirect('customer:customer_home')
+
+    order_id = request.POST['razorpay_order_id']
+    payment_id = request.POST['razorpay_payment_id']
+    signature = request.POST['razorpay_signature']
+    client = razorpay.Client(auth = (settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
+    params_dict = {
+            "razorpay_order_id": order_id,
+            "razorpay_payment_id": payment_id,
+            "razorpay_signature": signature
+        }
+    print(params_dict)
+    signature_valid = client.utility.verify_payment_signature(params_dict)
+    if signature_valid:
+        print("**************** yes")
+    
+        order_details = Order.objects.get(order_id = order_id)
+        order_details.payment_status = True
+        order_details.payment_id = payment_id
+        order_details.signature_id = signature
+        # order_details.shipping_address_id = shipping_address
+        order_details.order_status = 'order placed on ' + str(date.today())
+        cart = Cart.objects.filter(customer = request.session['customer'])
+
+        for item in cart:
+            order_item = OrderItem(order_id = order_details.id,  products_id = item.product.id, quantity = item.quantity, price = item.product.price )
+            order_item.save()
+            selected_qty = item.quantity
+            selected_product = Product.objects.get(id = item.product.id)
+            selected_product.stock -= selected_qty
+            selected_product.save()
+            
+
+   
+        order_details.save()
+        cart.delete()
+        return render(request,'customer/order_complete.html')
+
+        # customer_name = request.session['customer_name']
+        # order_number =  order_details.order_no
+        # current_year = datetime.now().year
+        
+        # subject = "Order Confirmation"
+        # from_email = settings.EMAIL_HOST_USER
+
+        # to_email = ['hafi@gmail.com']
+
+        
+        # address = DeliveryAddress.objects.get(customer = request.session['customer'], id = shipping_address)
+        # html_content = render_to_string('customer/invoice.html', {
+        # 'customer_name': customer_name,
+        # 'order_no': order_number,
+        # 'order_date': order_details.created_at,
+        # 'current_year': current_year,
+        # 'address': address,
+        # 'grand_total': order_details.total_amount
+        
+        # })
+            
+        # msg = EmailMultiAlternatives(subject, html_content, from_email, to_email)
+        # msg.attach_alternative(html_content, "text/html")
+
+ 
+        # msg.send()
+    
+    
 
 def place_order(request):
     return render(request, 'customer/place_order.html')
+
+def order_product(request):
+    cart = Cart.objects.filter(customer = request.session['customer']).annotate(sub_total = F('quantity')*F('price'))
+    grand_total = 0 
+    for item in cart:
+        grand_total += item.sub_total
+    order_amount = grand_total 
+    order_currency = 'INR'
+    order_receipt ='order_receipt_01'
+    notes = {'shipping address':'Koyas ,calicut'}
+    order_number = 'OD-EKART-'+str(randint(1111111111,9999999999))
+    client = razorpay.Client(auth = (settings.RAZORPAY_API_KEY,settings.RAZORPAY_API_SECRET))
+    payment = client.order.create({
+        'amount': order_amount*100,
+        'currency': order_currency,
+        'receipt':order_receipt,
+        'notes':notes
+    })
+    order = Order(customer_id = request.session['customer'],order_id = payment['id'],order_amount =grand_total,order_number = order_number)
+    order.save()
+
+
+    return JsonResponse(payment)
 
 
 def order_complete(request):

@@ -120,12 +120,9 @@
                 height="26"
               />
             </p>
-            <a
-              href="{% url 'customer:order_complete' %}"
-              class="btn btn-primary btn-block"
-            >
-              Checkout
-            </a>
+            <button type="button" class="btn btn-primary" id="razorpay_id">Checkout</button>
+              
+            
             <a href="{% url 'customer:store' %}" class="btn btn-light btn-block"
               >Continue Shopping</a
             >
@@ -141,7 +138,7 @@
   </div>
   <!-- container .//  -->
 </section>
-
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   var btnstatus = "";
   $(".update_cart").click(function () {
@@ -190,6 +187,66 @@
       },
     });
   });
+
+  $('#razorpay_id').click(function(){
+    $.ajaxSetup({
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+    });
+
+    $.ajax({
+      url :"{% url 'customer:order_product' %}",
+      method:'POST',
+      success:function(response){
+        console.log(response)
+        console.log(response.amount)
+        var options = {
+          'key':'rzp_test_1OE9P6t9IT1rtV',
+          'amount':response.amount,
+          'currency':'INR',
+          'name':'ekart',
+          'order_id':response.id,
+          'handler':function(response){
+            console.log(response)
+            update_payment(response)
+
+          },
+          'theme':{
+            'color':'red'
+          },
+          'prefill':{
+            'name':'Afi',
+            'email':'hafi@gmail.com',
+            'contact':'9876543210',
+            }  
+        }
+      var razorpay_1 = new Razorpay(options)
+      razorpay_1.open()
+      }
+
+    })
+  })
+  function update_payment(res){
+    $.ajaxSetup({
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+    });
+    $.ajax({
+      url:'{% url "customer:update_payment" %}',
+      method:'POST',
+      data:{
+        'razorpay_order_id':res.razorpay_order_id,
+        'razorpay_payment_id':res.razorpay_payment_id,
+        'razorpay_signature':res.razorpay_signature,
+      },
+      success:function(response){
+      
+        
+      }
+    })
+  }
 </script>
 
 {% endblock %}

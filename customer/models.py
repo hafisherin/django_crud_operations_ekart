@@ -35,8 +35,9 @@ class Order(models.Model):
     order_id = models.CharField( max_length = 50 ,unique = True)   
     created_at = models.DateField(default = date.today) 
     payment_status = models.BooleanField(default = False)
-    payment_id = models.CharField(max_length = 25 ,null = True ,unique = True)
-    signature_id = models.CharField(max_length = 25 ,unique = True, null = True)
+    payment_id = models.CharField(max_length = 100 ,null = True ,unique = True)
+    signature_id = models.CharField(max_length = 100 ,unique = True, null = True)
+    order_number = models.CharField(max_length = 100 ,unique = True  )
 
 
     class Meta:

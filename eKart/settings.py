@@ -148,4 +148,5 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'hafisherin007@gmail.com'
 EMAIL_HOST_PASSWORD = 'tjrd qyvs lfda gqhj'
 EMAIL_USE_TLS = True
-
+RAZORPAY_API_KEY = 'rzp_test_1OE9P6t9IT1rtV'
+RAZORPAY_API_SECRET = 'C5YsLfbMjEztigfHw7Oe045v'
